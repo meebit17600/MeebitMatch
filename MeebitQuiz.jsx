@@ -602,13 +602,52 @@ const NOUN_FALLBACK = [
 ];
 
 const TYPE_DESCRIPTIONS = {
-  Human: "You blend into any crowd but stand out in your own way.",
-  Pig: "You have a playful, carefree energy that's impossible to resist.",
-  Elephant: "You carry a quiet strength and wisdom that others can sense.",
-  Robot: "Your mind is a machine — precise, logical, and always optimizing.",
-  Skeleton: "There's a timeless, stripped-down authenticity to your vibe.",
-  Visitor: "You exist between worlds — familiar yet completely alien.",
-  Dissected: "You see through every layer. Nothing is hidden from you.",
+  Human: [
+    "You blend into any crowd but stand out in your own way.",
+    "People feel at home around you — you radiate familiarity.",
+    "You've got a quiet magnetism that draws people in without trying.",
+    "There's something deeply relatable about your energy.",
+    "You move through the world with an effortless sense of belonging.",
+    "You're the kind of person everyone feels like they already know.",
+    "You have an adaptable spirit that thrives in any environment.",
+    "Your approachability is your greatest strength.",
+  ],
+  Pig: [
+    "You have a playful, carefree energy that's impossible to resist.",
+    "Life's too short to be serious — and you're living proof.",
+    "Your infectious optimism lights up every room you enter.",
+    "You find joy in the little things and it's contagious.",
+  ],
+  Elephant: [
+    "You carry a quiet strength and wisdom that others can sense.",
+    "You never forget what matters — loyalty runs deep in your veins.",
+    "There's a gentle power to everything you do.",
+    "Your presence alone is enough to steady the room.",
+  ],
+  Robot: [
+    "Your mind is a machine — precise, logical, and always optimizing.",
+    "Efficiency isn't just a goal for you — it's a way of life.",
+    "You process the world differently, and that's your advantage.",
+    "Logic is your compass and it never leads you astray.",
+  ],
+  Skeleton: [
+    "There's a timeless, stripped-down authenticity to your vibe.",
+    "You've shed everything unnecessary and kept what matters.",
+    "Beneath the surface, you're all structure and substance.",
+    "You see things for what they really are — no illusions.",
+  ],
+  Visitor: [
+    "You exist between worlds — familiar yet completely alien.",
+    "There's an otherworldly quality to the way you think.",
+    "You see possibilities that nobody else can even imagine.",
+    "You bring a perspective from somewhere entirely different.",
+  ],
+  Dissected: [
+    "You see through every layer. Nothing is hidden from you.",
+    "You understand how things work at a level most can't reach.",
+    "Transparency isn't a choice for you — it's who you are.",
+    "You break things down to their core and rebuild better.",
+  ],
 };
 
 function pick(arr, id) { return arr[id % arr.length]; }
@@ -703,7 +742,9 @@ const OVERSHIRT_DESCS = {
 };
 
 function generateDescription(meebit) {
-  const typeDesc = TYPE_DESCRIPTIONS[meebit.type] || "";
+  const id = meebit.token_id;
+  const typePool = TYPE_DESCRIPTIONS[meebit.type] || ["You've got a unique energy all your own."];
+  const typeDesc = pick(typePool, id);
   const parts = [typeDesc];
 
   // Shirt description
