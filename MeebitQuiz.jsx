@@ -669,17 +669,66 @@ function generateUniqueTitles(results) {
   return titles;
 }
 
+const SHIRT_DESCS = {
+  Hoodie: "Comfort is your secret weapon — you perform best when you feel at ease.",
+  Suit: "You dress to impress and it shows in everything you do.",
+  Jacket: "You dress to impress and it shows in everything you do.",
+  Jersey: "You're a team player with a competitive streak a mile wide.",
+  Tee: "You keep things casual but your vibe speaks volumes.",
+};
+
+const GLASSES_DESCS = {
+  Specs: "You see the world through a sharper lens than most.",
+  Frameless: "You notice what others miss — details are your superpower.",
+  "3D Glasses": "You experience life in an extra dimension nobody else can see.",
+  Eyepatch: "There's a story behind that look, and people want to hear it.",
+  VR: "You live half in this world and half in the next one.",
+};
+
+const HAT_DESCS = {
+  "Baseball Cap": "You keep it real — no pretense, just good vibes.",
+  Beanie: "You've got a cozy soul that puts everyone around you at ease.",
+  "Top Hat": "There's a flair for the dramatic in everything you do.",
+  Headphones: "Music runs through your veins and sets the rhythm of your life.",
+  "Wool Hat": "You're grounded and practical, but never boring.",
+  Bandana: "You march to your own beat and wouldn't have it any other way.",
+};
+
+const OVERSHIRT_DESCS = {
+  "Leather Jacket": "There's an edge to you that keeps people intrigued.",
+  "Collar Shirt": "You balance polish and personality effortlessly.",
+  "Athletic Jacket": "You bring energy and drive to everything you touch.",
+  "Down Jacket": "You're built for any weather life throws your way.",
+  Cardigan: "You've got a warm, thoughtful energy that draws people in.",
+};
+
 function generateDescription(meebit) {
   const typeDesc = TYPE_DESCRIPTIONS[meebit.type] || "";
   const parts = [typeDesc];
+
+  // Shirt description
   if (meebit.shirt) {
     const s = meebit.shirt;
-    if (s.includes("Hoodie")) parts.push("Comfort is your secret weapon — you perform best when you feel at ease.");
-    else if (s.includes("Suit") || s.includes("Jacket")) parts.push("You dress to impress and it shows in everything you do.");
-    else if (s.includes("Jersey")) parts.push("You're a team player with a competitive streak a mile wide.");
-    else if (s.includes("Tee")) parts.push("You keep things casual but your vibe speaks volumes.");
+    const key = Object.keys(SHIRT_DESCS).find((k) => s.includes(k));
+    if (key) parts.push(SHIRT_DESCS[key]);
     else parts.push("Your style is uniquely yours — impossible to put in a box.");
   }
+
+  // Add a third sentence based on the most distinctive accessory
+  if (meebit.glasses && GLASSES_DESCS[meebit.glasses]) {
+    parts.push(GLASSES_DESCS[meebit.glasses]);
+  } else if (meebit.hat && HAT_DESCS[meebit.hat]) {
+    parts.push(HAT_DESCS[meebit.hat]);
+  } else if (meebit.overshirt && OVERSHIRT_DESCS[meebit.overshirt]) {
+    parts.push(OVERSHIRT_DESCS[meebit.overshirt]);
+  } else if (meebit.beard) {
+    parts.push("You carry a rugged confidence that commands respect.");
+  } else if (meebit.necklace) {
+    parts.push("You know that the right details make all the difference.");
+  } else if (meebit.earring) {
+    parts.push("You've got a bold streak that keeps things interesting.");
+  }
+
   return parts.join(" ");
 }
 
@@ -809,10 +858,10 @@ function QuizIntro({ onStart, dbLoaded }) {
       textAlign: "center", position: "relative",
     },
   },
-    React.createElement("div", {
-      className: "mm-intro-icon",
-      style: { fontSize: 80, marginBottom: 24, filter: "drop-shadow(0 0 30px rgba(124, 58, 237, 0.5))", animation: "float 3s ease-in-out infinite" },
-    }, "🔮"),
+    React.createElement(MeebitCarousel, {
+      size: 320, className: "mm-intro-icon",
+      animation: "float 3s ease-in-out infinite",
+    }),
     React.createElement("h1", {
       className: "mm-intro-title",
       style: {
@@ -847,7 +896,7 @@ function QuizIntro({ onStart, dbLoaded }) {
 }
 
 function QuizProgress({ current, total }) {
-  const pct = ((current + 1) / total) * 100;
+  const pct = (current / total) * 100;
   return React.createElement("div", { style: { marginBottom: 32 } },
     React.createElement("div", {
       style: { display: "flex", justifyContent: "space-between", marginBottom: 8, fontSize: 13, color: "#6b6b8a", fontWeight: 600 },
@@ -970,13 +1019,10 @@ function CalculatingScreen() {
       justifyContent: "center", minHeight: "60vh", textAlign: "center",
     },
   },
-    React.createElement("div", {
-      className: "mm-calc-icon",
-      style: {
-        fontSize: 80, marginBottom: 24, animation: "pulse 1.5s ease-in-out infinite",
-        filter: "drop-shadow(0 0 40px rgba(124, 58, 237, 0.6))",
-      },
-    }, "🔮"),
+    React.createElement(MeebitCarousel, {
+      size: 320, className: "mm-calc-icon",
+      animation: "pulse 1.5s ease-in-out infinite",
+    }),
     React.createElement("style", null, `
       @keyframes pulse { 0%, 100% { transform: scale(1); opacity: 1; } 50% { transform: scale(1.15); opacity: 0.8; } }
       @keyframes fadeUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
@@ -990,7 +1036,7 @@ function CalculatingScreen() {
         .mm-intro-title { font-size: 36px !important; letter-spacing: -1px !important; }
         .mm-intro-desc { font-size: 15px !important; margin-bottom: 32px !important; }
         .mm-intro-btn { padding: 16px 36px !important; font-size: 16px !important; }
-        .mm-intro-icon { font-size: 60px !important; }
+        .mm-intro-icon { width: 100px !important; height: 100px !important; }
         .mm-q-title { font-size: 22px !important; }
         .mm-answer-grid { grid-template-columns: repeat(2, 1fr) !important; gap: 8px !important; }
         .mm-answer-btn { padding: 14px 10px !important; }
@@ -1000,13 +1046,14 @@ function CalculatingScreen() {
         .mm-result-inner { flex-direction: column !important; text-align: center !important; }
         .mm-result-card { padding: 20px !important; }
         .mm-result-info { align-items: center !important; }
-        .mm-result-score { font-size: 28px !important; margin-top: 8px !important; }
+        .mm-result-score { font-size: 28px !important; margin-top: 8px !important; position: static !important; }
         .mm-result-title { font-size: 20px !important; }
         .mm-result-header { font-size: 28px !important; }
+        .mm-result-desc { max-width: 100% !important; text-align: center !important; }
         .mm-trait-wrap { justify-content: center !important; }
         .mm-result-link { justify-content: center !important; }
         .mm-calc-title { font-size: 20px !important; }
-        .mm-calc-icon { font-size: 64px !important; }
+        .mm-calc-icon { width: 100px !important; height: 100px !important; }
       }
       @media (max-width: 380px) {
         .mm-answer-grid { grid-template-columns: 1fr 1fr !important; }
@@ -1043,9 +1090,55 @@ function TraitChip({ cat, value, matched }) {
   );
 }
 
+const CAROUSEL_MEEBITS = ["/traits/type_visitor.webp", "/traits/type_pig.webp", "/traits/type_robot.webp"];
+
+function MeebitCarousel({ size, animation, className }) {
+  const [index, setIndex] = useState(0);
+  const [fade, setFade] = useState(true);
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setFade(false);
+      setTimeout(() => {
+        setIndex((i) => (i + 1) % CAROUSEL_MEEBITS.length);
+        setFade(true);
+      }, 300);
+    }, 2500);
+    return () => clearInterval(interval);
+  }, []);
+
+  return React.createElement("img", {
+    className,
+    src: CAROUSEL_MEEBITS[index],
+    alt: "Meebit",
+    style: {
+      width: size, height: size, marginBottom: 24,
+      borderRadius: 16, objectFit: "cover",
+      animation,
+      opacity: fade ? 1 : 0,
+      transition: "opacity 0.3s ease",
+    },
+  });
+}
+
 function MeebitImage({ tokenId, width, height }) {
   const [loaded, setLoaded] = useState(false);
   const [error, setError] = useState(false);
+  const [retries, setRetries] = useState(0);
+  const maxRetries = 3;
+
+  useEffect(() => {
+    if (error && retries < maxRetries) {
+      const timer = setTimeout(() => {
+        setError(false);
+        setLoaded(false);
+        setRetries((r) => r + 1);
+      }, 1500 * (retries + 1));
+      return () => clearTimeout(timer);
+    }
+  }, [error, retries]);
+
+  const imgSrc = MEEBIT_IMG(tokenId) + (retries > 0 ? `&_r=${retries}` : "");
 
   return React.createElement("div", {
     style: {
@@ -1057,7 +1150,7 @@ function MeebitImage({ tokenId, width, height }) {
   },
     !error
       ? React.createElement("img", {
-          src: MEEBIT_IMG(tokenId),
+          src: imgSrc,
           alt: `Meebit #${tokenId}`,
           onLoad: () => setLoaded(true),
           onError: () => setError(true),
@@ -1074,7 +1167,7 @@ function MeebitImage({ tokenId, width, height }) {
             display: "flex", alignItems: "center", justifyContent: "center",
             fontSize: width > 100 ? 48 : 24, color: "#4a4a6a",
           },
-        }, error ? "?" : "...")
+        }, error && retries >= maxRetries ? "?" : "...")
       : null,
   );
 }
@@ -1120,7 +1213,7 @@ function ResultCard({ entry, rank, profile, title: titleProp }) {
     // Top section: image + info + score
     React.createElement("div", {
       className: "mm-result-inner",
-      style: { display: "flex", alignItems: "center", gap: 20, marginBottom: 20 },
+      style: { display: "flex", alignItems: "flex-start", gap: 20, marginBottom: 20, position: "relative" },
     },
       // Meebit image
       React.createElement(MeebitImage, {
@@ -1130,13 +1223,28 @@ function ResultCard({ entry, rank, profile, title: titleProp }) {
       }),
       // Info
       React.createElement("div", { className: "mm-result-info", style: { flex: 1, minWidth: 0, display: "flex", flexDirection: "column" } },
-        isHero
-          ? React.createElement("div", {
-              style: { fontSize: 12, fontWeight: 700, color: "#a855f7", textTransform: "uppercase", letterSpacing: "0.05em", marginBottom: 4 },
-            }, "Your #1 Match")
-          : React.createElement("div", {
-              style: { fontSize: 12, fontWeight: 700, color: "#6b6b8a", textTransform: "uppercase", letterSpacing: "0.05em", marginBottom: 4 },
-            }, `Match #${rank + 1}`),
+        // Badge + Score row
+        React.createElement("div", {
+          style: { display: "flex", alignItems: "center", justifyContent: "space-between", gap: 12 },
+        },
+          isHero
+            ? React.createElement("div", {
+                style: { fontSize: 12, fontWeight: 700, color: "#a855f7", textTransform: "uppercase", letterSpacing: "0.05em", marginBottom: 4 },
+              }, "Your #1 Match")
+            : React.createElement("div", {
+                style: { fontSize: 12, fontWeight: 700, color: "#6b6b8a", textTransform: "uppercase", letterSpacing: "0.05em", marginBottom: 4 },
+              }, `Match #${rank + 1}`),
+          // Score
+          React.createElement("div", {
+            className: "mm-result-score",
+            style: {
+              fontSize: 36, fontWeight: 900, flexShrink: 0,
+              background: "linear-gradient(135deg, #a855f7, #c084fc)",
+              WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent",
+              filter: "drop-shadow(0 0 8px rgba(168, 85, 247, 0.3))",
+            },
+          }, `${Math.round(score)}%`),
+        ),
         React.createElement("div", {
           className: "mm-result-title",
           style: { fontSize: 24, fontWeight: 800, color: "#e2e2f0", letterSpacing: "-0.5px" },
@@ -1156,22 +1264,13 @@ function ResultCard({ entry, rank, profile, title: titleProp }) {
             alignItems: "center", gap: 4, marginTop: 4,
           },
         }, "View on Meebits.com \u2197"),
-        // Description
-        React.createElement("p", {
-          style: { fontSize: 14, color: "#c8c8d8", lineHeight: 1.6, marginTop: 8, maxWidth: 500 },
-        }, desc),
       ),
-      // Score
-      React.createElement("div", {
-        className: "mm-result-score",
-        style: {
-          fontSize: 36, fontWeight: 900, flexShrink: 0,
-          background: "linear-gradient(135deg, #a855f7, #c084fc)",
-          WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent",
-          filter: "drop-shadow(0 0 8px rgba(168, 85, 247, 0.3))",
-        },
-      }, `${Math.round(score)}%`),
     ),
+    // Description — full width below the image+info row
+    React.createElement("p", {
+      className: "mm-result-desc",
+      style: { fontSize: 14, color: "#c8c8d8", lineHeight: 1.6, marginTop: 0, marginBottom: 16 },
+    }, desc),
     // Traits
     React.createElement("div", {
       className: "mm-trait-wrap",
@@ -1192,7 +1291,6 @@ function ResultsPage({ results, profile, onRestart }) {
   const titles = generateUniqueTitles(results);
   const hero = results[0];
   const runners = results.slice(1);
-
   return React.createElement("div", { style: { animation: "fadeUp 0.5s ease-out" } },
     React.createElement("div", { style: { textAlign: "center", marginBottom: 32 } },
       React.createElement("div", { style: { fontSize: 48, marginBottom: 8, filter: "drop-shadow(0 0 20px rgba(168, 85, 247, 0.4))" } }, "✨"),
