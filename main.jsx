@@ -1,7 +1,7 @@
 import React from "react";
 import { createRoot } from "react-dom/client";
-import MeebitTraitGuide from "./MeebitTraitGuide.jsx";
+import MeebitQuiz from "./MeebitQuiz.jsx";
 
 createRoot(document.getElementById("root")).render(
-  React.createElement(MeebitTraitGuide)
+  React.createElement(MeebitQuiz)
 );

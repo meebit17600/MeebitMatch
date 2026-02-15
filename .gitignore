@@ -1,0 +1,9 @@
+node_modules/
+dist/
+.DS_Store
+*.csv
+*.zip
+meebits_database.json
+meebits_rules.json
+meebits_rules_report.md
+trait-images/
